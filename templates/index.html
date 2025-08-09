@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zoo Animal Classifier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #f9fafc 0%, #e0f7fa 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background: rgba(255,255,255,0.98);
+      border-radius: 32px;
+      box-shadow: 0 8px 32px rgba(44, 62, 80, 0.16);
+      padding: 48px 36px 36px 36px;
+      max-width: 600px;
+      margin: 64px auto 32px auto;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 1.2s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .mascot-row {
+      display: flex;
+      gap: 22px;
+      margin-bottom: 18px;
+      justify-content: center;
+      font-size: 2.5rem;
+      filter: drop-shadow(0 2px 8px #b3c6e0aa);
+    }
+    h1 {
+      color: #1a237e;
+      margin-bottom: 10px;
+      font-size: 2.3rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-align: center;
+      text-shadow: 0 2px 8px #b3c6e044;
+    }
+    .subtitle {
+      color: #00838f;
+      font-size: 1.13rem;
+      margin-bottom: 28px;
+      text-align: center;
+      font-weight: 500;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px 16px;
+      justify-content: center; 
+      align-items: center;;
+    }
+    .input-card {
+      background: #e3f2fd;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px #b3e5fc55;
+      padding: 18px 14px 12px 14px;
+      width: 47%;
+      min-width: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: box-shadow 0.2s, transform 0.2s;
+      position: relative;
+      font-size: 1.08rem;
+      border: 2px solid transparent;
+    }
+    .input-card:hover, .input-card:focus-within {
+      box-shadow: 0 4px 24px #0288d1aa;
+      border: 2px solid #0288d1;
+      transform: translateY(-2px) scale(1.03);
+      z-index: 1;
+    }
+    .input-card label {
+      font-size: 1.08rem;
+      color: #01579b;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .input-card select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid #b7d0f7;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 1.08rem;
+      margin-bottom: 2px;
+      transition: border 0.2s;
+      font-family: inherit;
+    }
+    .input-card select:focus {
+      border: 2px solid #0288d1;
+      outline: none;
+      background: #e1f5fe;
+    }
+    .button-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+      gap: 18px;
+    }
+    button {
+      background: linear-gradient(90deg, #0288d1, #26c6da);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 13px 34px;
+      font-size: 1.13rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+      box-shadow: 0 2px 8px #b3e5fcaa;
+      letter-spacing: 0.5px;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #26c6da, #0288d1);
+      box-shadow: 0 4px 16px #0288d144;
+      transform: scale(1.04);
+    }
+    #loading, #result {
+      margin-top: 24px;
+      font-size: 1.18rem;
+      font-weight: 700;
+      display: none;
+      text-align: center;
+      min-height: 36px;
+    }
+    #result .animal-result {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 1.28rem;
+      background: #fffde7;
+      border-radius: 14px;
+      padding: 18px 24px;
+      box-shadow: 0 2px 12px #ffe08255;
+      color: #1a237e;
+    }
+    .positive { color: #0288d1; }
+    .negative { color: #c62828; }
+    footer {
+      margin-top: 38px;
+      font-size: 1.08rem;
+      color: #00838f;
+      text-align: center;
+      font-weight: 500;
+    }
+    @media (max-width: 700px) {
+      .container { padding: 12px 2vw; max-width: 99vw; }
+      form { gap: 10px 2vw; }
+      .input-card { width: 98vw; min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="mascot-row">
+      🦁 🐦 🐍 🐟 🦎 🐞 🐾
+    </div>
+    <h1>Zoo Animal Classifier</h1>
+    <div class="subtitle">Enter animal features and discover its class! <span style="font-size:1.3em;">🦁🐦🐟🐞</span></div>
+
+    <form id="predict-form" autocomplete="off">
+      <div class="input-card">
+        <label for="hair">Hair <span title="Hair">🦁</span></label>
+        <select id="hair" name="hair" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="feathers">Feathers <span title="Feathers">🪶</span></label>
+        <select id="feathers" name="feathers" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="eggs">Eggs <span title="Eggs">🥚</span></label>
+        <select id="eggs" name="eggs" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="milk">Milk <span title="Milk">🥛</span></label>
+        <select id="milk" name="milk" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="airborne">Airborne <span title="Airborne">🐦</span></label>
+        <select id="airborne" name="airborne" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="aquatic">Aquatic <span title="Aquatic">🐟</span></label>
+        <select id="aquatic" name="aquatic" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="predator">Predator <span title="Predator">🦁</span></label>
+        <select id="predator" name="predator" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="toothed">Toothed <span title="Toothed">🦷</span></label>
+        <select id="toothed" name="toothed" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="backbone">Backbone <span title="Backbone">🦴</span></label>
+        <select id="backbone" name="backbone" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="breathes">Breathes <span title="Breathes">🫁</span></label>
+        <select id="breathes" name="breathes" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="venomous">Venomous <span title="Venomous">🐍</span></label>
+        <select id="venomous" name="venomous" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="fins">Fins <span title="Fins">🐟</span></label>
+        <select id="fins" name="fins" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="tail">Tail <span title="Tail">🐈</span></label>
+        <select id="tail" name="tail" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="domestic">Domestic <span title="Domestic">🏠</span></label>
+        <select id="domestic" name="domestic" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="catsize">Cat Size <span title="Cat Size">🐱</span></label>
+        <select id="catsize" name="catsize" required>
+          <option value="" selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="input-card">
+        <label for="legs">Legs <span title="Number of Legs">🦵</span></label>
+        <select id="legs" name="legs" required>
+          <option value="" selected>Select</option>
+          <option value="0">0</option>
+          <option value="2">2</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="8">8</option>
+        </select>
+      </div>
+      <div class="button-row">
+        <button type="submit" id="predict-btn">Predict</button>
+        <button type="button" id="clear-btn">Clear</button>
+      </div>
+    </form>
+
+    <div id="loading">🦓 Crunching the jungle data...</div>
+    <div id="result"></div>
+
+    <footer>DSA AI/ML Project – 2025 &bull; <span style="font-size:1.2em;">🦁🐦🐟🐞</span></footer>
+  </div>
+
+<script>
+  const form = document.getElementById('predict-form');
+  const loading = document.getElementById('loading');
+  const resultDiv = document.getElementById('result');
+  const clearBtn = document.getElementById('clear-btn');
+
+  // Animal icons for result (use big emojis for a bold look)
+  const animalIcons = {
+    "Mammal": "🦁",
+    "Bird": "🐦",
+    "Reptile": "🦎",
+    "Fish": "🐟",
+    "Amphibian": "🐸",
+    "Bug": "🐞",
+    "Invertebrate": "🦐"
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resultDiv.style.display = 'none';
+    loading.style.display = 'block';
+
+    const features = [
+      Number(form.hair.value),
+      Number(form.feathers.value),
+      Number(form.eggs.value),
+      Number(form.milk.value),
+      Number(form.airborne.value),
+      Number(form.aquatic.value),
+      Number(form.predator.value),
+      Number(form.toothed.value),
+      Number(form.backbone.value),
+      Number(form.breathes.value),
+      Number(form.venomous.value),
+      Number(form.fins.value),
+      Number(form.tail.value),
+      Number(form.domestic.value),
+      Number(form.catsize.value),
+      Number(form.legs.value)
+    ];
+
+    if (features.some(f => f === "" || isNaN(Number(f)))) {
+      loading.style.display = 'none';
+      resultDiv.innerHTML = '<span class="negative">Please select all features.</span>';
+      resultDiv.style.display = 'block';
+      return;
+    }
+
+    try {
+      const response = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ features })
+      });
+
+      loading.style.display = 'none';
+
+      const data = await response.json();
+      if (response.ok) {
+        const icon = animalIcons[data.prediction] ? `<span style="font-size:2.5em;">${animalIcons[data.prediction]}</span>` : '';
+        resultDiv.className = 'positive';
+        resultDiv.innerHTML = `<div class="animal-result">${icon}<span>Prediction: <b>${data.prediction}</b> (${data.confidence || '✓'})</span></div>`;
+      } else {
+        resultDiv.className = 'negative';
+        resultDiv.textContent = 'Error: ' + (data.error || 'Unknown issue');
+      }
+      resultDiv.style.display = 'block';
+    } catch (err) {
+      loading.style.display = 'none';
+      resultDiv.className = 'negative';
+      resultDiv.textContent = 'Unable to reach server. Try again later.';
+      resultDiv.style.display = 'block';
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    form.reset();
+    resultDiv.style.display = 'none';
+  });
+</script>
+</body>
+</html>
