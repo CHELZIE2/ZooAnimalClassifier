@@ -31,18 +31,18 @@ Each model was trained individually and compared using:
 -ROC Curve with OneVsRestClassifier
 
 Reflection: What Worked, What Didn’t, Future Improvements
-*What Worked:
+What Worked:
 Ensemble model improved robustness
 SHAP visualizations offered clear feature insights
 Clean separation of front-end/back-end with Flask API
 Feature engineering decisions led to better performance
 
-*What Didn’t Work Initially:
+What Didn’t Work Initially:
 Redundant feature (legs and legs_scaled) caused model mismatch
 Minor Flask input validation errors
 SHAP errors due to data type misalignment
 
-*Future Improvements:
+Future Improvements:
 Replace manual input fields with drop-downs or toggle switches
 Auto-scale legs on frontend from raw value
 Include test-time data validation and error prompts
